@@ -1,6 +1,6 @@
 # Utilização de técnicas de Aprendizado de Máquina aliadas aos saberes tradicionais para apoio ao processo de inovação na produção de cachaça artesanal em Abreus - MG
 
-___Projeto de Extensão Edital 08/2017 IF Sudeste MG, Campus Barbacena___
+___Projeto de Extensão Edital 08/2017 - IF Sudeste MG, Campus Barbacena___
 
 __Orientador:__ <a href="http://lattes.cnpq.br/3995585094514614" target="_blank">Prof. Rafael José de Alencar Almeida</a><br />
 __Bolsista:__ <a href="http://lattes.cnpq.br/4539575610533576" target="_blank">Luciano Carlos de Paiva</a>
