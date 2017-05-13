@@ -7,7 +7,7 @@ __Bolsista:__ <a href="http://lattes.cnpq.br/4539575610533576" target="_blank">L
 
 Trabalho baseado em processos de cunho científico, cultural e educativo junto à comunidade de produtores de cachaça artesanal de Abreus / MG, para o mapeamento dos fatores e parâmetros envolvidos no desenvolvimento das variedades do produto, correlacionados à sua qualidade sensorial. Estes indicadores serão utilizados no desenvolvimento de uma ferramenta de software baseada em técnicas de inteligência artificial para mapear o impacto de cada variável de produção na qualidade do produto final, e possibilitar o uso de simulações durante o desenvolvimento de novos tipos de cachaça – proporcionando orientações quantitativas a serem combinadas com os saberes tradicionais na inovação do produto, e reduzindo os custos dos processos de experimentação durante a produção.
 
-<img style="display: block; margin-left: auto; margin-right: auto" src="http://aprendizadodemaquina.com.br/grafico_aguradente.png" alt="Gráfico aprendizado de máquina aplicado à produção de cachaça">
+<img src="http://aprendizadodemaquina.com.br/grafico_aguradente.png?v=3" alt="Gráfico aprendizado de máquina aplicado à produção de cachaça">
 
 ## Configuração e instalação
 
