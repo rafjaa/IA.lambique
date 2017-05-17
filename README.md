@@ -27,7 +27,7 @@ Clone ou baixe este repositório e descompacte na pasta:
 
 <p>Dentro da pasta do projeto possui o arquivo “requirements.txt”, que contém a lista de pacotes necessários para execução do mesmo. O comando abaixo cria o ambiente virtual com nome ‘mla’, utilizando Python 3.5 e instala todos os pacotes listado no arquivo “requirements.txt”.</p>
 <pre>
-$ conda create -n mla python=3.5 --file requirements.txt
+$ conda create -n mla python=3.6 --file requirements.txt
 </pre>
 <p>
 Para utilizar o ambiente criado anteriormente, ele precisa estar ativado. Usamos o seguinte comando:
