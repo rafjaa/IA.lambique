@@ -13,10 +13,31 @@ __Bolsista:__ <a href="http://lattes.cnpq.br/4539575610533576" target="_blank">L
 
 Passos para configurar o ambiente e executar o software:
 
-- Instalar a linguagem Python3: https://www.python.org/downloads/
-- Instalar a biblioteca Miniconda: https://conda.io/miniconda.html
-- Clonar ou baixar este repositório e descompactar na pasta...
-- Executar o comando:
+<p>Faça o download do <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> a partir do site oficial, de acordo com seu sistema operacional. Como o conda permite a criação de vários ambientes com versões diferente, instale a versão com o Python mais usual. A instalação é bem simples. No linux, necessita apenas adicionar permissão de execução no script e executá-lo para começar a instalação, com seguinte comando:</p>
+
 <pre>
-Comandos...
+$ chmod +x nome_do_arquivo_instalacao.sh
+$ ./nome_do_arquivo_instalacao.sh
 </pre>
+
+<p>
+Clone ou baixe este repositório e descompacte na pasta:
+</p>
+<pre>git clone https://github.com/rafjaa/aprendizado_maquina_aguardente.git</pre>
+
+<p>Dentro da pasta do projeto possui o arquivo “requirements.txt”, que contém a lista de pacotes necessários para execução do mesmo. O comando abaixo cria o ambiente virtual com nome ‘mla’, utilizando Python 3.5 e instala todos os pacotes listado no arquivo “requirements.txt”.</p>
+<pre>
+$ conda create -n mla python=3.5 --file requirements.txt
+</pre>
+<p>
+Para utilizar o ambiente criado anteriormente, ele precisa estar ativado. Usamos o seguinte comando:
+</p>
+<pre>
+$ source activate mla
+</pre>
+
+<p>
+A partir de agora, pode se executar qualquer <i>script</i> dentro do ambiente!
+</p>
+
+
