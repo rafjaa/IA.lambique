@@ -1,0 +1,11 @@
+# Python
+*~
+*.pyc
+*.pyo
+
+# pip
+pip-log.txt
+build
+
+# jupyter-notebook
+.ipynb_checkpoints
