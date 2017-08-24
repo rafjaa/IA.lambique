@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>CachacaApp</title>
+		
+		<!--Import Google Icon Font-->
+      	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+		<!-- Compiled and minified CSS -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+
+	</head>
+<body>
+	<!-- -->
+	<nav class="nav-extended">
+		<div class="nav-wrapper">
+			<a href="#" class="brand-logo">CachaçaAPP</a>
+		  	<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+		  	<ul id="nav-mobile" class="right hide-on-med-and-down">
+				<li><a href="/dados">Dados</a></li>
+				<li><a href="/analise">Análise</a></li>
+				<li><a href="/simulacao">Simulação</a></li>
+		  	</ul>
+		  	<ul class="side-nav" id="mobile-demo">
+				<li><a href="/dados">Sass</a></li>
+				<li><a href="/analise">Components</a></li>
+				<li><a href="/simulacao">JavaScript</a></li>
+		  	</ul>
+		</div>
+	</nav>
+
+
+	{% with messages = get_flashed_messages() %}
+	  {% if messages %}
+		<ul class=flashes>
+		{% for message in messages %}
+		  <li>{{ message }}</li>
+		{% endfor %}
+		</ul>
+	  {% endif %}
+	{% endwith %}
+
+	
+	{% block content%}
+	{% endblock%}
+
+	
+	
+	<!-- Compiled and minified JavaScript -->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -9,3 +9,8 @@ build
 
 # jupyter-notebook
 .ipynb_checkpoints
+
+dataset
+model
+.info
+__pycache__

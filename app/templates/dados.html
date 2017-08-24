@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h3>Entre com dados</h3>
+	
+
+	<form method="post" action="/dados" enctype="multipart/form-data">
+		
+		<input type="file" name="file" multiple />
+		<button type="submit">Upload</button>
+
+	</form>
+{% endblock %}
