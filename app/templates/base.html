@@ -1,51 +1,195 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>CachacaApp</title>
-		
-		<!--Import Google Icon Font-->
-      	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<head>
+	<title>CachacaApp</title>
 
-		<!-- Compiled and minified CSS -->
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+	<!--Import Google Icon Font-->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-	</head>
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+	<meta charset="utf-8">
+
+</head>
 <body>
-	<!-- -->
+
+	<!-- Menu -->
 	<nav class="nav-extended">
-		<div class="nav-wrapper">
+		<div class="nav-wrapper container">
 			<a href="#" class="brand-logo">CachaçaAPP</a>
-		  	<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-		  	<ul id="nav-mobile" class="right hide-on-med-and-down">
-				<li><a href="/dados">Dados</a></li>
-				<li><a href="/analise">Análise</a></li>
-				<li><a href="/simulacao">Simulação</a></li>
-		  	</ul>
-		  	<ul class="side-nav" id="mobile-demo">
+
+			<ul id="nav-mobile" class="right">
+				<li>
+					<a href="https://github.com/rafjaa/aprendizado_maquina_aguardente" target="_blank" class="tooltipped" data-position="left" data-tooltip="Saiba mais...">
+						<i class="material-icons left">info</i>
+					</a>
+				</li>
+			</ul>
+
+			<ul class="side-nav" id="mobile-demo">
 				<li><a href="/dados">Sass</a></li>
-				<li><a href="/analise">Components</a></li>
-				<li><a href="/simulacao">JavaScript</a></li>
-		  	</ul>
+			</ul>
 		</div>
 	</nav>
 
+	<!-- conteúdo -->
+	<div class="container">
 
-	{% with messages = get_flashed_messages() %}
-	  {% if messages %}
-		<ul class=flashes>
-		{% for message in messages %}
-		  <li>{{ message }}</li>
-		{% endfor %}
-		</ul>
-	  {% endif %}
-	{% endwith %}
+		<!-- Opções tab -->
+		<div class="card-tabs">
+			<ul class="tabs ">
+				<li class="tab"><a class="active" href="#dados">Dados</a></li>
+				<li class="tab"><a  href="#analises">Análise</a></li>
+				<li class="tab"><a href="#simulacao">Simulação</a></li>
+			</ul>
+		</div>
+		
 
-	
-	{% block content%}
-	{% endblock%}
+		<!-- ***************************** DADOS *********************************-->
+		<div class="card" id="dados">
+			<div class="card-panel">
+				<span class="card-title">Entre com os dados</span>
+			
+				<form method="post" action="/dados" enctype="multipart/form-data">
+					<div class="card-content">		
+						
+						<div class="row">
+							<p> Eu sou um cartão muito simples. Eu sou bom para conter pequenas informações. 
+								Eu sou conveniente por que eu preciso de muito pouca marcação para ser usado 
+								efetivamente. Eu sou um cartão muito simples. Eu sou bom para conter pequenas informações. 
+								Eu sou conveniente por que eu preciso de muito pouca marcação para ser usado 
+								efetivamente. Eu sou um cartão muito simples. Eu sou bom para conter pequenas informações. 
+								Eu sou conveniente por que eu preciso de muito pouca marcação para ser usado 
+								efetivamente. Eu sou um cartão muito simples. Eu sou bom para conter pequenas informações. 
+								Eu sou conveniente por que eu preciso de muito pouca marcação para ser usado 
+								efetivamente.
+							</p>
+						</div>
 
-	
-	
+						<div class="row">
+							<!-- <input type="file" name="file" multiple />	 -->
+							<div class="col s6 offset-s3" id="selecaoarquivo"> 
+								<div class="file-field input-field">
+									<div class="btn">
+										<span>File</span>
+										<input type="file" multiple>
+									</div>
+									<div class="file-path-wrapper">
+										<input class="file-path validate" type="text" placeholder="Upload one or more files">
+									</div>
+								</div>
+							</div>
+						</div>
+					
+					</div>		
+					
+					<!-- Botão enviar arquivo -->
+					<div class="card-action">
+						<button class="btn waves-effect waves-light right" type="submit" >Enviar</button>
+					</div>
+				</form>
+			</div>
+		</div>  <!-- Fim card dados -->
+
+
+		<!-- ******************************ANÁLISE********************************-->
+		<div id="analises" class="card">
+			<div class="card-panel">	
+				<span class="card-title">Visualize as análises</span>
+				
+				<div class="card-content">
+					<!-- {% if not otimizado %}
+						<a href="/analise/otimiza?filename={{file}}">otimiza</a>
+					{% endif %} -->
+					
+					<!-- Matriz de correlação -->
+					<div class="row">
+						<h5>Matriz correlação</h5>
+						<div class="col s12 m6">
+							<img src="/static/img/m_corr.png?v={{n}}" class="responsive-img materialboxed">
+						</div> 
+
+						<div class="col s12 m6">
+							<p> A ferramenta Matriz de Correlação permite calcular a correlação entre variáveis através dos coeficientes de Pearson, 
+								Spearman ou Kendall. A opção de gráfico permite gerar uma Matriz de Scatterplots.
+								A ferramenta Matriz de Correlação permite calcular a correlação entre variáveis através dos coeficientes de Pearson, 
+								Spearman ou Kendall. A opção de gráfico permite gerar uma Matriz de Scatterplots.
+							</p>
+						</div>
+
+					</div>
+
+					<!-- Gráfico de features importance -->
+					<div class="row">
+						<h5>Importância dos parâmetros</h5>
+						
+						<div class="col s12 m6">
+							<img src="/static/img/features_importance.png?v={{n}}" class="responsive-img materialboxed">
+						</div>		
+
+						<div class="col s12 m6">
+							<p> A ferramenta Matriz de Correlação permite calcular a correlação entre variáveis através dos coeficientes de Pearson, 
+								Spearman ou Kendall. A opção de gráfico permite gerar uma Matriz de Scatterplots.
+								A ferramenta Matriz de Correlação permite calcular a correlação entre variáveis através dos coeficientes de Pearson, 
+								Spearman ou Kendall. A opção de gráfico permite gerar uma Matriz de Scatterplots.
+							</p>
+						</div>
+					</div>
+
+				</div>
+				
+				<!-- Botão download -->
+				<div class="card-action">
+					<button class="btn waves-effect waves-light right" type="submit" >Download</button>
+				</div>
+			</div>
+		</div> <!-- Fim card análises -->
+
+
+		<!-- ******************************SIMULAÇÃO********************************-->
+		<div id="simulacao" class="card">
+			<div class="card-panel">	
+				<span class="card-title">Simulação</span>
+				<form action="#" method="POST">
+					
+					
+
+					<div class="card-content">
+
+						{% for feature in features %}
+
+							<div class="row range-field">
+
+								<span class="col s12 m12 l2">{{ feature.nome }}</span>
+
+								<div class="col s12 m12 l9">
+									<input type="range" min={{ feature.min }}
+									max={{ feature.max }} step="0.001" name="{{ feature.nome }}"
+									oninput='document.getElementById("{{ loop.index  }}").value = this.value;'/>
+								</div>
+
+								<div class="col s12 m12 l1">	
+									<input id={{ loop.index }} disabled value="{{ feature.media }}"></input>
+								</div>
+
+							</div>
+
+						{% endfor %} 
+
+						{{nota}}
+
+					<!-- Botão calcula saída para novas entradas -->
+					<div class="card-action">
+						<button class="btn waves-effect waves-light right" type="submit" >Calcular</button>
+					</div>
+				</form>
+			</div><!-- Fim card simulação -->
+		</div>
+	</div><!-- conteúdo -->
+
+
 	<!-- Compiled and minified JavaScript -->
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>

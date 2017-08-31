@@ -299,7 +299,7 @@ def simulacao():
         form_data = request.form.to_dict()
         nota = avalia_feature([f['nome'] for f in features], **form_data)
 
-    return render_template('simulacao.html', features=features, nota=nota)
+    return render_template('base.html', features=features, nota=nota)
 
 
 def plot_variacao_parametros(df, path):

@@ -1,4 +1,4 @@
-$(document).ready(
-	function () { $("#profilelink").click(function () { $('.nav a[href="#profile"]').tab('show'); });
-
-	6});
+$(document).ready(function(){
+	// Aqui vem o conteúdo do script
+	//alert('DOM carregado');
+});
