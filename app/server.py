@@ -8,9 +8,9 @@ import matplotlib
 import xgboost as xgb
 import json
 from sklearn import preprocessing
+from tinydb import Query, TinyDB
 
 from classificador import cria_modelo, avalia_feature
-from classificador import carrega_modelo
 from settings import *
 
 matplotlib.style.use('ggplot')
@@ -24,11 +24,14 @@ app.debug = True
 # Caminho para gráfico features importance
 GRAFICO_F_IMPORTANCE = 'static/img/features_importance.png'
 
-# Caminho para gráfico variação dos parâmetros
-GRAFICO_V_PARAMETROS = 'static/img/variacao.png'
+# Define local para savar informações
+User = Query()
+db = TinyDB('db.json')
+table = db.table('info')
 
-# Caminho para gráfico matriz correlação
-GRAFICO_M_CORRELACAO = 'static/img/m_corr.png'
+# Cria diretório de dataset
+if not os.path.exists('dataset'):
+    os.mkdir('dataset')
 
 
 def allowed_file(filename):
@@ -56,7 +59,7 @@ def index():
 def info():
     ''' '''
 
-    return json.dumps(obtem_informacao(INFO, 'filename', 'pontuacao'))
+    return json.dumps(table.all()[0])
 
 
 @app.route('/dados', methods=["POST"])
@@ -67,68 +70,23 @@ def dados():
         o usuário é redirecionado para página de análise
     """
     if request.method == 'POST':
-        print(request.files)
         file = request.files['file']
 
         # Verifica se foi selecionado algum arquivo
         if file.filename == '':
-            flash('Nenhum arquivo foi selecionado!')
-            return redirect(request.url)
+            return json.dumps({'erro': 'Nenhum arquivo!'})
 
         # Verifica a extensão do arquivo
         if not allowed_file(file.filename):
-            return json.dumps(
-                {'jquery-upload-file-error': 'Arquivo invalido!'}
-            )
-
-        flash('O arquivo foi enviado com sucesso!')
+            return json.dumps({'erro': 'Arquivo invalido!'})
 
         # Salva o arquivo selecionado
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        if os.path.exists(INFO):
-            os.remove(INFO)
+        status, resul = processa(filename)
 
-        # salva nome do arquivo dataset
-        salva_informacao(filename=filename)
-
-        dict_info = analise()
-
-        # Process(target=otimiza).start()
-
-        return json.dumps(dict_info)
-    else:
-        return render_template('dados.html')
-
-
-def otimiza():
-    """ Cria um modelo otimizado
-
-        Returns:
-            Renderiza a página de análise
-    """
-    print('Otimizando...')
-    try:
-        # Obtém o nome do arquivo de entrada
-        file = obtem_informacao(INFO, 'filename')['filename']
-
-        # Abre aquivo de entrada e o armazena no DataFrame
-        df = pd.read_csv('{0}/{1}'.format(UPLOAD_FOLDER, file), sep=',')
-
-        modelo, pontuacao = cria_modelo_otimizado(df)
-
-        # Gráfico de importância dos parâmetros
-        plot_features_importance(modelo, GRAFICO_F_IMPORTANCE)
-
-        print('Otimizado', pontuacao)
-
-        # Altera no arquivo de informação o status de otimizado
-        # e a pontuação do classificador
-        salva_informacao(INFO, pontuacao=pontuacao, otimizado=True)
-
-    except (FileNotFoundError):
-        print('Falha ao ler csv')
+        return json.dumps({'status': status, 'pontuacao': resul})
 
 
 def categoriza_rotulos(y_labels):
@@ -195,93 +153,62 @@ def pre_processa_entrada(df):
     return X, dict_classes
 
 
-# @app.route('/analise', methods=['GET', 'POST'])
-def analise():
+def processa(filename):
     """ Cria um modelo
         Returns:
-            Renderiza a página de análise
-    """
+            Um modelo treinado
 
-    modelo = None
-    file = None
-    otimizado = None
-    pontuacao = None
-    dict_info = None
+        Error:
+            0 = Sucesso
+            1 = Erro ao treinar o modelo
+            2 = Dataset Vazio
+            3 = Arquivo não encontrado
+    """
 
     try:
 
-        dict_info = obtem_informacao(
-            INFO, *['otimizado', 'pontuacao', 'filename']
-        )
+        # Abre aquivo de entrada e o armazena no DataFrame
+        df = pd.read_csv('{0}/{1}'.format(UPLOAD_FOLDER, filename), sep=',')
 
-        file = dict_info['filename']
-        otimizado = dict_info['otimizado']
-        pontuacao = dict_info['pontuacao']
+        # Pré-processa arquivo de entrada
+        df, dict_classes = pre_processa_entrada(df)
 
-    except (TypeError, KeyError):
-        otimizado = False
+        # Persiste o DataFrame pré-processado
+        df.to_csv('{0}/{1}'.format(UPLOAD_FOLDER, filename), index=False)
 
-    print(file)
-    if 'filename' not in dict_info:
-        try:
-            modelo = carrega_modelo()
-        except FileNotFoundError:
-            # Selecione arquivo em caso de falha
-            flash('Nenhum modelo foi criado, selecione os dados para análise!')
-            return redirect('/dados')
+        modelo, pontuacao = cria_modelo(df)
 
-    else:
-        try:
+        if modelo is None:
+            return 1, None
 
-            # Abre aquivo de entrada e o armazena no DataFrame
-            df = pd.read_csv('{0}/{1}'.format(UPLOAD_FOLDER, file), sep=',')
+        # Gráfico de importância dos parâmetros
+        plot_features_importance(modelo, GRAFICO_F_IMPORTANCE)
 
-            # Pré-processa arquivo de entrada
-            df, dict_classes = pre_processa_entrada(df)
-
-            # Persiste o DataFrame pré-processado
-            df.to_csv('{0}/{1}'.format(UPLOAD_FOLDER, file), index=False)
-
-            modelo, pontuacao = cria_modelo(df)
-
-            if modelo is None:
-                flash('Algum erro ocorreu na criação do modelo!')
-                return redirect('/dados')
-
-            # Gráfico de importância dos parâmetros
-            plot_features_importance(modelo, GRAFICO_F_IMPORTANCE)
-
-            features = []
-
-            # Salva a informação das colunas dos dados de entrada,
-            # para serem usadas na simulação
-            for column in df.columns[:-1]:
-                features.append({
-                    'nome': column,
-                    'max': float(df[column].max()),
-                    'min': float(df[column].min()),
-                    'media': round(float(df[column].mean()), 3)
-                })
-
-            salva_informacao(**{
-                'filename': file, 'modelo': 'model/0001.model',
-                'otimizado': False, 'pontuacao': pontuacao,
-                'features': features, 'dict_classes': dict_classes
+        # Salva a informação das colunas dos dados de entrada,
+        # para serem usadas na simulação
+        features = []
+        for column in df.columns[:-1]:
+            features.append({
+                'nome': column,
+                'max': float(df[column].max()),
+                'min': float(df[column].min()),
+                'media': round(float(df[column].mean()), 3)
             })
 
-        except FileNotFoundError as e:
-            flash('O arquivo não pode ser aberto!')
-            print(e)
+        dict_info = {
+            'filename': filename, 'modelo': 'model/0001.model',
+            'pontuacao': pontuacao, 'features': features,
+            'dict_classes': dict_classes
+        }
 
-        except pd.errors.EmptyDataError:
-            flash('O arquivo csv está vazio!')
-            return redirect('/dados')
+        table.update(dict_info) if len(table.all()) == 1 else table.insert(dict_info)
 
-        except ValueError as e:
-            flash('Dados insuficientes!', e)
-            return redirect('/dados')
+    except FileNotFoundError:
+        return 3, None
+    except pd.errors.EmptyDataError:
+        return 2, None
 
-    return {'otimizado': otimizado, 'pontuacao': pontuacao}
+    return 0, pontuacao
 
 
 @app.route('/simulacao', methods=['GET', 'POST'])
@@ -295,7 +222,8 @@ def simulacao():
     """
 
     # Carrega o arquivo de informações dos dados de entrada
-    features = obtem_informacao(INFO, 'features')
+    # features = obtem_informacao(INFO, 'features')
+    features = table.all()[0]
 
     # Caso seja realizado uma requisição POST, realiza-se a avaliação
     if request.method == 'POST':
@@ -336,52 +264,6 @@ def plot_features_importance(modelo, path):
     plt.xlabel('Importância')
     plt.ylabel('Parâmetros')
     plt.savefig(path)
-
-
-def salva_informacao(path=INFO, **kwargs):
-    """ Salva as informações em arquivo
-
-        Args:
-            path: Caminho onde o arquivo será salvo
-            **kwargs: Lista de parâmetros a ser salva
-    """
-    try:
-        arq = kwargs
-
-        if os.path.exists(path):
-            arq = json.load(open(path))
-            arq.update(kwargs)
-
-        with open(path, 'w') as f:
-            f.write(json.dumps(arq))
-
-    except json.decoder.JSONDecodeError:
-        print('Erro ao gravar informação do dataset!')
-
-
-def obtem_informacao(path=INFO, *args):
-    """ Retorna as informações salvas em arquivo
-
-        Args:
-            path: Caminho onde o arquivo será salvo
-            *args: Lista de parâmetros a ser salva
-    """
-    try:
-        dict_info = None
-        print(path, args)
-
-        if os.path.exists(path):
-            arq = json.load(open(path))
-
-            if len(args):
-                dict_info = {k: v for (k, v) in arq.items() if k in args}
-            else:
-                dict_info = arq
-
-        return dict_info
-
-    except json.decoder.JSONDecodeError:
-        print('Erro ao recuperar informação do dataset!')
 
 
 if __name__ == "__main__":

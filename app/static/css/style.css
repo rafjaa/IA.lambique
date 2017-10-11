@@ -41,7 +41,7 @@ a[href="#top"]{
 	margin: 0px;
 }
 
-.ajax-file-upload-error{
+.ajax-file-upload-error, #erro{
 	color: red;
 	text-align: center;
 }

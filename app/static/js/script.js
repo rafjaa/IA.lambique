@@ -13,6 +13,7 @@ $(document).ready(function(){
 		}, 'json')
 	}
 	obtem_modelo_carregado();
+
 	
 	// Envia um arquivo via ajax
 	var uploadObj = $("#fileuploader").uploadFile({
@@ -20,8 +21,12 @@ $(document).ready(function(){
 		fileName:"file",
 		maxFileCount: 1,
 		onSuccess: function(files, data, xhr, pd){
+			result = JSON.parse(data)
+			if (result.status == 1)
+				$('#erro').text('Ocorreu um erro no processamento verifique seus dados de entrada!')
 
-			 obtem_modelo_carregado();
+
+			obtem_modelo_carregado();
 
 			// Evita cache da imagem
 			img = $("#features_importance")
@@ -41,6 +46,9 @@ $(document).ready(function(){
 			uploadObj.reset();
 		},
 		onSelect:function(files){
+	       // Limpa caixa de erro
+	       $('#erro').text('');
+	       
 	       $('#modal1').modal('open');
 	       
 	       $('#enviar_sim').click(function(){
