@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>CachacaApp</title>
+
+	<!--Import Google Icon Font-->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet" type="text/css" href="static/css/materialize.min.css">
+	<link rel="stylesheet" type="text/css" href="static/css/uploadfile.css">
+	<link rel="stylesheet" type="text/css" href="static/css/style.css">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<meta charset="utf-8">
+
+</head>
+<body>
+	<!-- Menu -->
+	<div class="navbar-fixed">
+		<nav class="nav-extended green  darken-3 id="cabecalho">
+			<div class="nav-wrapper container">
+				<a href="#" class="brand-logo">CachacaAPP</a>
+
+				<ul id="nav-mobile" class="right">
+					<li>
+						<a id='sobre' href="https://github.com/rafjaa/aprendizado_maquina_aguardente" 
+								target="_blank" class="tooltipped" data-position="left" data-tooltip="Saiba mais...">
+							<i><img src="/static/img/info.svg"/></i>
+						</a>
+					</li>
+				</ul>
+
+			</div>
+		</nav>
+	</div>
+	
+	<div id='abas' class="center nav-content container">
+
+		<!-- Opções tab -->
+		<div class="card-tabs fixed ">
+			<ul class="tabs tabs-fixed-width">
+				<li class="tab"><a class="active" href="#dados" id="card_dados">Dados</a></li>
+				<li class="tab"><a href="#simulacao" id="card_simulacao">Simulação</a></li>
+			</ul>
+		</div>
+
+		<!-- Progresso -->
+		<div class="progress">
+	    	<div class="indeterminate"></div>
+	  	</div>
+	</div>
+
+	<!-- conteúdo -->		
+	<div id="conteudo" class="container">
+		
+		<!-- ***************************** DADOS *********************************-->
+		<div class="card" id="dados">
+			<div class="card-panel">
+				<strong class="card-title">Entre com os dados</strong>
+				
+				<div class="card-content">		
+					
+					<div class="row">
+						<p> Eu sou um cartão muito simples. Eu sou bom para conter pequenas informações. 
+							Eu sou conveniente por que eu preciso de muito pouca marcação para ser usado 
+							efetivamente. Eu sou um cartão muito simples. Eu sou bom para conter pequenas informações. 
+							Eu sou conveniente por que eu preciso de muito pouca marcação para ser usado 
+							efetivamente. Eu sou um cartão muito simples. Eu sou bom para conter pequenas informações. 
+							Eu sou conveniente por que eu preciso de muito pouca marcação para ser usado 
+							efetivamente. Eu sou um cartão muito simples. Eu sou bom para conter pequenas informações. 
+							Eu sou conveniente por que eu preciso de muito pouca marcação para ser usado 
+							efetivamente.
+						</p>
+					</div>
+					
+					<br>
+					<div class="row">
+						<div class="center">
+							<strong>Informações salva</strong>
+							<ul id="modelo_carregado" >
+							</ul>
+						</div>
+					</div>
+
+					<div id="fileuploader" >Upload</div>	
+
+					<!-- Modal Structure -->
+					<div id="modal1" class="modal">
+						<div class="modal-content">
+							<h4>Continuar?</h4>
+						  	<p>Os dados anteriores serão perdidos. Deseja continuar?</p>
+						</div>
+						<div class="modal-footer">
+						  	<a id="enviar_sim" class="modal-action modal-close waves-effect waves-green btn-flat">Sim</a>
+						  	<a id="enviar_nao" class="modal-action modal-close waves-effect waves-green btn-flat">Não</a>
+						</div>
+					</div>
+					
+					<hr>
+					<div class="row">
+						<div class="col s12 ">
+							<span class="card-title">Importância dos parâmetros</span>
+							<p> A ferramenta Matriz de Correlação permite calcular a correlação entre variáveis através dos coeficientes de Pearson, 
+								Spearman ou Kendall. A opção de gráfico permite gerar uma Matriz de Scatterplots.
+								A ferramenta Matriz de Correlação permite calcular a correlação entre variáveis através dos coeficientes de Pearson, 
+								Spearman ou Kendall. A opção de gráfico permite gerar uma Matriz de Scatterplots.
+							</p>
+							<img id="features_importance" src="/static/img/features_importance.png?v=" class="responsive-img materialboxed">
+						</div> 
+					</div>
+				</div>		
+			</div>
+		</div>  <!-- Fim card dados -->
+
+		<!-- ******************************SIMULAÇÃO********************************-->
+		<div id="simulacao" class="card">
+			<div class="card-panel">	
+				<span class="card-title">Simulação</span>
+
+				<!-- <div id="nota">Nota: <strong id='nota'></strong></div> -->
+				<form method="POST" id="form_simulacao">
+					<div class="card-content" id="features">
+					</div>
+				</form>
+				<div id="nota">Pontuação: ?<strong></strong></div>
+				
+			</div>
+		</div> <!-- Fim card simulação -->
+	</div> <!-- conteúdo -->
+
+	<!-- botão topo -->
+	<a href="#top" class="btn-floating btn-large waves-effect waves-light green darken-3"><i><img src="static/img/topo.svg" /></i></a>
+
+	<!-- Compiled and minified JavaScript -->
+	<script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
+	
+	<!-- Materialize -->
+	<script type="text/javascript" src="static/js/materialize.min.js"></script>
+	
+	<!-- JQuery-->
+	<script type="text/javascript" src="static/js/jquery.tmpl.min.js"></script>
+
+	<!-- Envio de arquivo -->
+	<script type="text/javascript" src="static/js/jquery.form.js"></script>
+	<script type="text/javascript" src="static/js/jquery.uploadfile.min.js"></script>
+	
+	<script type="text/javascript" src="static/js/script.js"></script>
+</body>
+</html>

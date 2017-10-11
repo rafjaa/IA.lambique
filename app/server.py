@@ -1,20 +1,19 @@
 import os
-from math import ceil
 
-from flask import Flask, request, flash, redirect, url_for, render_template
+from flask import Flask, request, flash, render_template
 from werkzeug.utils import secure_filename
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
+import matplotlib
 import xgboost as xgb
-from random import randrange
 import json
 from sklearn import preprocessing
 
-from classificador import cria_modelo, cria_modelo_otimizado, avalia_feature
+from classificador import cria_modelo, avalia_feature
 from classificador import carrega_modelo
 from settings import *
 
+matplotlib.style.use('ggplot')
 
 # Servidor HTTP
 app = Flask(__name__)
@@ -46,16 +45,29 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/')
-@app.route('/dados', methods=["GET", "POST"])
+@app.route('/', methods=['GET'])
 def index():
+    ''' Exibe página principal '''
+
+    return render_template('index.html')
+
+
+@app.route('/info', methods=['GET'])
+def info():
+    ''' '''
+
+    return json.dumps(obtem_informacao(INFO, 'filename', 'pontuacao'))
+
+
+@app.route('/dados', methods=["POST"])
+def dados():
     """ Caso seja utilizado o método GET há renderização da página
         de inserção do conjunto de dados, caso seja utilizado POST
         é carregado o arquivo csv de entrada, em caso de sucesso,
         o usuário é redirecionado para página de análise
     """
     if request.method == 'POST':
-
+        print(request.files)
         file = request.files['file']
 
         # Verifica se foi selecionado algum arquivo
@@ -65,8 +77,9 @@ def index():
 
         # Verifica a extensão do arquivo
         if not allowed_file(file.filename):
-            flash('Arquivo invalido!')
-            return redirect(request.url)
+            return json.dumps(
+                {'jquery-upload-file-error': 'Arquivo invalido!'}
+            )
 
         flash('O arquivo foi enviado com sucesso!')
 
@@ -77,19 +90,25 @@ def index():
         if os.path.exists(INFO):
             os.remove(INFO)
 
-        return redirect(url_for('analise', filename=filename))
+        # salva nome do arquivo dataset
+        salva_informacao(filename=filename)
 
+        dict_info = analise()
+
+        # Process(target=otimiza).start()
+
+        return json.dumps(dict_info)
     else:
         return render_template('dados.html')
 
 
-@app.route('/analise/otimiza', methods=['GET'])
 def otimiza():
     """ Cria um modelo otimizado
 
         Returns:
             Renderiza a página de análise
     """
+    print('Otimizando...')
     try:
         # Obtém o nome do arquivo de entrada
         file = obtem_informacao(INFO, 'filename')['filename']
@@ -99,20 +118,17 @@ def otimiza():
 
         modelo, pontuacao = cria_modelo_otimizado(df)
 
-        # Gráfico de importancia dos parâmetros
-        plot_features_importance(modelo)
+        # Gráfico de importância dos parâmetros
+        plot_features_importance(modelo, GRAFICO_F_IMPORTANCE)
+
+        print('Otimizado', pontuacao)
 
         # Altera no arquivo de informação o status de otimizado
         # e a pontuação do classificador
-        salva_informacao(pontuacao=pontuacao, otimizado=True)
+        salva_informacao(INFO, pontuacao=pontuacao, otimizado=True)
 
-    except (TypeError, FileNotFoundError):
+    except (FileNotFoundError):
         print('Falha ao ler csv')
-
-    return render_template(
-        'analise.html', df='', n=randrange(1000),
-        otimizado=True, pontos=pontuacao
-    )
 
 
 def categoriza_rotulos(y_labels):
@@ -179,12 +195,13 @@ def pre_processa_entrada(df):
     return X, dict_classes
 
 
-@app.route('/analise', methods=['GET', 'POST'])
+# @app.route('/analise', methods=['GET', 'POST'])
 def analise():
     """ Cria um modelo
         Returns:
             Renderiza a página de análise
     """
+
     modelo = None
     file = None
     otimizado = None
@@ -193,14 +210,19 @@ def analise():
 
     try:
 
-        dict_info = obtem_informacao(INFO, 'otimizado', 'pontuacao')
+        dict_info = obtem_informacao(
+            INFO, *['otimizado', 'pontuacao', 'filename']
+        )
+
+        file = dict_info['filename']
         otimizado = dict_info['otimizado']
         pontuacao = dict_info['pontuacao']
 
-    except (TypeError):
+    except (TypeError, KeyError):
         otimizado = False
 
-    if 'filename' not in request.args:
+    print(file)
+    if 'filename' not in dict_info:
         try:
             modelo = carrega_modelo()
         except FileNotFoundError:
@@ -210,7 +232,6 @@ def analise():
 
     else:
         try:
-            file = request.args['filename']
 
             # Abre aquivo de entrada e o armazena no DataFrame
             df = pd.read_csv('{0}/{1}'.format(UPLOAD_FOLDER, file), sep=',')
@@ -226,12 +247,6 @@ def analise():
             if modelo is None:
                 flash('Algum erro ocorreu na criação do modelo!')
                 return redirect('/dados')
-
-            # Gráfico de correlação
-            plot_matriz_correlacao(df, GRAFICO_M_CORRELACAO)
-
-            # Gráfico variação de parâmetros
-            plot_variacao_parametros(df, GRAFICO_V_PARAMETROS)
 
             # Gráfico de importância dos parâmetros
             plot_features_importance(modelo, GRAFICO_F_IMPORTANCE)
@@ -266,10 +281,7 @@ def analise():
             flash('Dados insuficientes!', e)
             return redirect('/dados')
 
-    return render_template(
-        'analise.html', df='', n=randrange(1000),
-        file=file, otimizado=otimizado, pontos=pontuacao
-    )
+    return {'otimizado': otimizado, 'pontuacao': pontuacao}
 
 
 @app.route('/simulacao', methods=['GET', 'POST'])
@@ -282,10 +294,21 @@ def simulacao():
             Renderiza a página de simulação
     """
 
-    nota = None
-
     # Carrega o arquivo de informações dos dados de entrada
     features = obtem_informacao(INFO, 'features')
+
+    # Caso seja realizado uma requisição POST, realiza-se a avaliação
+    if request.method == 'POST':
+
+        # Obtém dados do formulário
+        form_data = request.form.to_dict()
+
+        # Realiza a avaliação
+        nota = avalia_feature(
+            [f['nome'] for f in features['features']], **form_data
+        )
+
+        return json.dumps({'sucesso': True, 'nota': float(nota)})
 
     # Verifica falha na leitura das features
     if features is None:
@@ -294,65 +317,7 @@ def simulacao():
 
     features = features['features']
 
-    # Caso seja realizado uma requisição POST, realiza-se a avaliação
-    if request.method == 'POST':
-        form_data = request.form.to_dict()
-        nota = avalia_feature([f['nome'] for f in features], **form_data)
-
-    return render_template('base.html', features=features, nota=nota)
-
-
-def plot_variacao_parametros(df, path):
-    """ Salva a variação dos parâmetros do DataFrame para um arquivo
-        em formato .png
-
-        Args:
-            df: DataFrame utilizado no cálculo da variação dos parâmetros
-            path: caminho onde será salva o arquivo
-
-    """
-    # Agrupa pela última coluna e obtém a média destes valores
-    df_mean = df.groupby(df.columns[-1]).mean()
-
-    # Define configurações do gráfico
-    rows, cols = df_mean.shape
-    nrows = ceil(cols / 3)
-    ncols = cols if cols < 3 else 3
-
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10, nrows * 4))
-    axes_list = axes.flatten()
-    fig.suptitle("Variação dos parâmetros")
-
-    # Aumenta espaço entre gráficos
-    fig.subplots_adjust(hspace=0.4, wspace=0.3)
-
-    # Plota gráfico com média dos elementos, agrupado pela nota
-    for i, column in enumerate(df_mean.columns):
-        ax = axes_list[i]
-        ax.set_title(column)
-        df_mean[column].plot(ax=ax, kind="line")
-
-    # Salvando a figura do gráfico criado
-    plt.savefig(path)
-
-
-def plot_matriz_correlacao(df, path):
-    """ Salva a matriz de correlação do DataFrame para um arquivo
-        em formato .png
-
-        Args:
-            df: DataFrame utilizado no cálculo da matriz de correlação
-            path: caminho onde será salva o arquivo
-
-    """
-    # Calcula a correlação
-    corr_mat = df.corr()
-
-    f, ax = plt.subplots(figsize=(10, 10))
-    sns.heatmap(corr_mat, vmax=.2, square=True, annot=True)
-
-    # Salvando a figura do gráfico criado
-    plt.savefig(path)
+    return json.dumps({'features': features})
 
 
 def plot_features_importance(modelo, path):
@@ -362,7 +327,14 @@ def plot_features_importance(modelo, path):
             modelo: modelo utilizado na geração do gráfico
             path: caminho onde será salva o arquivo
     """
-    xgb.plot_importance(modelo)
+    matplotlib.rcParams.update({'font.size': 20})
+
+    fig, ax = plt.subplots(figsize=(25, 15))
+
+    ax = xgb.plot_importance(modelo, ax=ax, grid=False)
+    plt.title('Importância dos parâmetros', fontsize=30)
+    plt.xlabel('Importância')
+    plt.ylabel('Parâmetros')
     plt.savefig(path)
 
 
@@ -392,7 +364,7 @@ def obtem_informacao(path=INFO, *args):
 
         Args:
             path: Caminho onde o arquivo será salvo
-            **kwargs: Lista de parâmetros a ser salva
+            *args: Lista de parâmetros a ser salva
     """
     try:
         dict_info = None

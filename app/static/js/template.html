@@ -1,0 +1,15 @@
+
+<div class="row features">
+	
+	<span class="col s12 m12 l2"><strong>${nome}</strong></span>
+	<div class="col s12 m12 l9 range-field"> 
+		<input type="range" min=${min}
+		max=${max} step="0.001" name="${nome}"
+		oninput='document.getElementById("f_${index}").value = this.value;'/>
+	</div>
+
+	<div class="col s12 m12 l1">	
+		<input id="f_${index}" disabled value="${media}"></input>
+	</div>
+
+</div>
