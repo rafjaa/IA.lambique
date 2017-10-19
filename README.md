@@ -11,35 +11,23 @@ __Bolsistas:__
 
 <p>Trabalho baseado em processos de cunho científico, cultural e educativo junto à comunidade de produtores de cachaça artesanal de Abreus / MG, para o mapeamento dos fatores e parâmetros envolvidos no desenvolvimento das variedades do produto, correlacionados à sua qualidade sensorial. Estes indicadores serão utilizados no desenvolvimento de uma ferramenta de software baseada em técnicas de inteligência artificial para mapear o impacto de cada variável de produção na qualidade do produto final, e possibilitar o uso de simulações durante o desenvolvimento de novos tipos de cachaça – proporcionando orientações quantitativas a serem combinadas com os saberes tradicionais na inovação do produto, e reduzindo os custos dos processos de experimentação durante a produção.</p>
 
-## Configuração e instalação
+## Configuração e instalação 
+<p>Caso ainda não tenha, instale a versão do Python3 disponível em https://www.python.org/downloads, de acordo com sua distribuição.</p> 
+<p>Vamos utilizar o <a href=https://virtualenv.pypa.io/en/stable/>virtualenv</a>, onde será possível a instalação de todas as dependências utilizadas no programa em um ambiente virtual. No linux, em distribuições baseada no Debian,  o Virtualenv pode ser instalado com o comando:</p>
+<pre>$ sudo apt-get install virtualenv</pre>
 
-Passos para configurar o ambiente e executar o software:
-
-<p>Faça o download do <a href="https://conda.io/miniconda.html" target="_blank">Miniconda</a> a partir do site oficial, de acordo com seu sistema operacional. Como o conda permite a criação de vários ambientes com versões diferente, instale a versão com o Python mais usual. A instalação é bem simples. No linux, necessita apenas adicionar permissão de execução no script e executá-lo para começar a instalação, com seguinte comando:</p>
-
-<pre>
-$ chmod +x nome_do_arquivo_instalacao.sh
-$ ./nome_do_arquivo_instalacao.sh
-</pre>
-
-<p>
 Clone ou baixe este repositório e descompacte na pasta:
-</p>
-<pre>git clone https://github.com/rafjaa/aprendizado_maquina_aguardente.git</pre>
+<pre>$ git clone https://github.com/rafjaa/aprendizado_maquina_aguardente.git </pre>
 
-<p>Dentro da pasta do projeto possui o arquivo “requirements.txt”, que contém a lista de pacotes necessários para execução do mesmo. O comando abaixo cria o ambiente virtual com nome ‘mla’, utilizando Python 3.5 e instala todos os pacotes listado no arquivo “requirements.txt”.</p>
-<pre>
-$ conda create -n mla python=3.6 --file requirements.txt
-</pre>
-<p>
-Para utilizar o ambiente criado anteriormente, ele precisa estar ativado. Usamos o seguinte comando:
-</p>
-<pre>
-$ source activate mla
-</pre>
+Entre na pasta do projeto e crie um ambiente virtual com virtualenv, especificando a versão utilizada do Python:
+<pre>$ virtualenv env --python=python3</pre>
 
-<p>
-A partir de agora, pode se executar qualquer <i>script</i> dentro do ambiente!
-</p>
+Após a criação é necessário ativar o ambiente, o mesmo pode ser realizado com o comando:
+<pre>$ source ./env/bin/activate</pre>
 
+Com o ambiente virtual ativado, instale as dependências, listadas no arquivo "requirements.txt":
+<pre>(env)$ pip install -r ./requirements.txt</pre>
+
+Com o ambiente configurado, entre na pasta "/app" e execute o arquivo "server.py". Após, abra o navegador e vá para o endereço: http://127.0.0.1:5000:
+<pre>(env)$ python server.py</pre>
 
