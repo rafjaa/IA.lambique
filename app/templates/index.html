@@ -18,7 +18,7 @@
 <body>
 	<!-- Menu -->
 	<div class="navbar-fixed">
-		<nav class="nav-extended green  darken-3 id="cabecalho">
+		<nav class="nav-extended id="cabecalho">
 			<div class="nav-wrapper container">
 				<a href="#" class="brand-logo">CachacaAPP</a>
 
@@ -108,7 +108,8 @@
 								A ferramenta Matriz de Correlação permite calcular a correlação entre variáveis através dos coeficientes de Pearson, 
 								Spearman ou Kendall. A opção de gráfico permite gerar uma Matriz de Scatterplots.
 							</p>
-							<img id="features_importance" src="/static/img/features_importance.png?v=" class="responsive-img materialboxed">
+							<!-- <img id="features_importance" src="/static/img/features_importance.png?v=" class="responsive-img materialboxed"> -->
+							<canvas id="grafico"></canvas>
 						</div> 
 					</div>
 				</div>		
@@ -132,7 +133,7 @@
 	</div> <!-- conteúdo -->
 
 	<!-- botão topo -->
-	<a href="#top" class="btn-floating btn-large waves-effect waves-light green darken-3"><i><img src="static/img/topo.svg" /></i></a>
+	<a href="#top" class="btn-floating btn-large waves-effect waves-light"><i><img src="static/img/topo.svg" /></i></a>
 
 	<!-- Compiled and minified JavaScript -->
 	<script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
@@ -147,6 +148,8 @@
 	<script type="text/javascript" src="static/js/jquery.form.js"></script>
 	<script type="text/javascript" src="static/js/jquery.uploadfile.min.js"></script>
 	
+	<script type="text/javascript" src="static/js/Chart.min.js"></script>
+
 	<script type="text/javascript" src="static/js/script.js"></script>
 </body>
 </html>

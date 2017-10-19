@@ -84,9 +84,11 @@ def dados():
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        status, resul = processa(filename)
+        status, resul, fscore = processa(filename)
 
-        return json.dumps({'status': status, 'pontuacao': resul})
+        return json.dumps(
+            {'status': status, 'pontuacao': resul, 'fscore': fscore}
+        )
 
 
 def categoriza_rotulos(y_labels):
@@ -181,6 +183,8 @@ def processa(filename):
         if modelo is None:
             return 1, None
 
+        fscore = modelo.booster().get_fscore()
+
         # Gráfico de importância dos parâmetros
         plot_features_importance(modelo, GRAFICO_F_IMPORTANCE)
 
@@ -198,7 +202,7 @@ def processa(filename):
         dict_info = {
             'filename': filename, 'modelo': 'model/0001.model',
             'pontuacao': pontuacao, 'features': features,
-            'dict_classes': dict_classes
+            'dict_classes': dict_classes, 'fscore': fscore,
         }
 
         table.update(dict_info) if len(table.all()) == 1 else table.insert(dict_info)
@@ -208,7 +212,7 @@ def processa(filename):
     except pd.errors.EmptyDataError:
         return 2, None
 
-    return 0, pontuacao
+    return 0, pontuacao, fscore
 
 
 @app.route('/simulacao', methods=['GET', 'POST'])

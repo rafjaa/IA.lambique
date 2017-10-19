@@ -5,15 +5,84 @@ $(document).ready(function(){
 
 	 $('.modal').modal();
 
+	 function processa_dados_grafico(dict){
+
+		// Create items array
+		var items = Object.keys(dict).map(function(key) {
+		    return [key, dict[key]];
+		});
+
+		// Sort the array based on the second element
+		items.sort(function(first, second) {
+		    return second[1] - first[1];
+		});
+
+		labels = []
+		values = []
+		for (var i = 0; i < items.length; i++){
+			labels.push(items[i][0])
+			values.push(items[i][1])
+		}
+		return [labels, values]
+
+	}
+
+	function getRandomColorEachEmployee(count) {
+        var data =[];
+        for (var i = 0; i < count; i++) {
+            data.push(getRandomColor());
+        }
+        return data;
+    }
+
+	function getRandomColor() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16	)] + 0.2;
+
+        }
+        return color;
+    }
+
 	// Carrega informações armazenadas
 	function obtem_modelo_carregado(){
 		$.get('/info', function(data){
 			$('#modelo_carregado').html(
 				'<li>Nome do arquivo: <strong>' + data.filename + '</strong></li>Eficiência: <strong>' + data.pontuacao.toFixed(3)*100 + ' 	%</strong></li>')
+
+				// Gráfico
+				data = processa_dados_grafico(data.fscore)
+				var ctx = $('#grafico');
+
+				var grafico = new Chart(ctx, {
+					type: 'horizontalBar',
+					data: {
+						labels: data[0],
+						datasets: [{
+							
+							data: data[1],
+							backgroundColor: 'rgba(255, 0, 0, 0.2)',//getRandomColorEachEmployee(data[0].length),
+							borderColor: 'rgba(255, 50, 0, 1)',
+							borderWidth: 1
+
+						}]
+					},
+					options:{
+						title: {
+							display: true,
+							text: 'Importância dos parâmetros',
+							fontSize: 30
+						},
+						legend: {
+							display: false
+						}
+					}
+				});
+
 		}, 'json')
 	}
 	obtem_modelo_carregado();
-
 	
 	// Envia um arquivo via ajax
 	var uploadObj = $("#fileuploader").uploadFile({
@@ -22,11 +91,12 @@ $(document).ready(function(){
 		maxFileCount: 1,
 		onSuccess: function(files, data, xhr, pd){
 			result = JSON.parse(data)
+			console.log('Resultado' + data);
+
 			if (result.status == 1)
 				$('#erro').text('Ocorreu um erro no processamento verifique seus dados de entrada!')
 
-
-			obtem_modelo_carregado();
+			obtem_modelo_carregado();			
 
 			// Evita cache da imagem
 			img = $("#features_importance")
