@@ -15,17 +15,21 @@ b{
 }
 
 .tabs .tab a{
-    color:#00ACC1;
+    color: green;
+    text-align: left;
 }
+
 .tabs .tab a:hover,.tabs .tab a.active {
 	background-color:transparent;
-	color:#008B9B;
+	color:green;
 }
+
 .tabs .tab.disabled a,.tabs .tab.disabled a:hover {
-	color:rgba(102,147,153,0.7);	
+	color: green;	
 }
+
 .tabs .indicator {
-	background-color:#009BAD;
+	background-color:green;
 }
 
 /* Botão voltar ao topo */

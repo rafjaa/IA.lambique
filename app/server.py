@@ -33,6 +33,9 @@ table = db.table('info')
 if not os.path.exists('dataset'):
     os.mkdir('dataset')
 
+if not os.path.exists('model'):
+    os.mkdir('model')
+
 
 def allowed_file(filename):
     """ Verifica extensão do arquivo de entrada
@@ -59,7 +62,12 @@ def index():
 def info():
     ''' '''
 
-    return json.dumps(table.all()[0])
+    try:
+    	return json.dumps(table.all()[0])
+    except IndexError as e:
+    	return json.dumps({})
+
+    
 
 
 @app.route('/dados', methods=["POST"])
@@ -181,7 +189,7 @@ def processa(filename):
         modelo, pontuacao = cria_modelo(df)
 
         if modelo is None:
-            return 1, None
+            return 1, None, None
 
         fscore = modelo.booster().get_fscore()
 
@@ -208,9 +216,9 @@ def processa(filename):
         table.update(dict_info) if len(table.all()) == 1 else table.insert(dict_info)
 
     except FileNotFoundError:
-        return 3, None
+        return 3, None, None
     except pd.errors.EmptyDataError:
-        return 2, None
+        return 2, None, None
 
     return 0, pontuacao, fscore
 
@@ -227,7 +235,11 @@ def simulacao():
 
     # Carrega o arquivo de informações dos dados de entrada
     # features = obtem_informacao(INFO, 'features')
-    features = table.all()[0]
+    info = table.all()
+    if len(info) == 1:
+    	features = info[0]
+    else:
+    	return json.dumps({'erro': 'erro'})
 
     # Caso seja realizado uma requisição POST, realiza-se a avaliação
     if request.method == 'POST':
@@ -250,24 +262,6 @@ def simulacao():
     features = features['features']
 
     return json.dumps({'features': features})
-
-
-def plot_features_importance(modelo, path):
-    """ Salva um arquivo em formato .png com a importância dos parâmetros
-
-        Args:
-            modelo: modelo utilizado na geração do gráfico
-            path: caminho onde será salva o arquivo
-    """
-    matplotlib.rcParams.update({'font.size': 20})
-
-    fig, ax = plt.subplots(figsize=(25, 15))
-
-    ax = xgb.plot_importance(modelo, ax=ax, grid=False)
-    plt.title('Importância dos parâmetros', fontsize=30)
-    plt.xlabel('Importância')
-    plt.ylabel('Parâmetros')
-    plt.savefig(path)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,4 @@
 
-
 $(document).ready(function(){
 	var count=0; 
 
@@ -62,9 +61,8 @@ $(document).ready(function(){
 						datasets: [{
 							
 							data: data[1],
-							backgroundColor: 'rgba(255, 0, 0, 0.2)',//getRandomColorEachEmployee(data[0].length),
-							borderColor: 'rgba(255, 50, 0, 1)',
-							borderWidth: 1
+							backgroundColor: 'rgba(255, 0, 0, 0.4)',//getRandomColorEachEmployee(data[0].length),
+							
 
 						}]
 					},
