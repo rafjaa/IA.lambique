@@ -59,7 +59,7 @@ $(document).ready(function(){
 					data: {
 						labels: data[0],
 						datasets: [{
-							
+							label:"Pontuação",
 							data: data[1],
 							backgroundColor: 'rgba(255, 0, 0, 0.4)',//getRandomColorEachEmployee(data[0].length),
 							
@@ -69,12 +69,21 @@ $(document).ready(function(){
 					options:{
 						title: {
 							display: true,
-							text: 'Importância dos parâmetros',
+							text: '',//'Importância dos parâmetros',
 							fontSize: 30
 						},
 						legend: {
 							display: false
-						}
+						},
+
+						scales: {
+							xAxes: [{
+								ticks: {
+									display: false,
+
+								}
+							}]
+						},
 					}
 				});
 
@@ -169,8 +178,8 @@ $(document).ready(function(){
 
 		$.post("/simulacao", data, function(data) {
   
-  			$('#nota').text('Pontuação: ' + data['nota']);
-  			Materialize.toast('Pontuação: ' + data.nota, 4000, 'rounded')
+  			$('#nota').text(data['y_label'] + ': ' + data['nota']);
+  			Materialize.toast(data['y_label'] + ': ' + data.nota, 4000, 'rounded')
 
 		},'json').fail(function(){
 			console.log('Erro');

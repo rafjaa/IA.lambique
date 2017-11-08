@@ -21,13 +21,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'some_secret'
 app.debug = True
 
-# Caminho para gráfico features importance
-GRAFICO_F_IMPORTANCE = 'static/img/features_importance.png'
-
 # Define local para savar informações
 User = Query()
 db = TinyDB('db.json')
 table = db.table('info')
+le = ''
 
 # Cria diretório de dataset
 if not os.path.exists('dataset'):
@@ -63,11 +61,9 @@ def info():
     ''' '''
 
     try:
-    	return json.dumps(table.all()[0])
+        return json.dumps(table.all()[0])
     except IndexError as e:
     	return json.dumps({})
-
-    
 
 
 @app.route('/dados', methods=["POST"])
@@ -112,16 +108,17 @@ def categoriza_rotulos(y_labels):
 
     """
     # Instancia e treina o LabelEncoder
+    print(y_labels)
     le = preprocessing.LabelEncoder()
     le.fit(y_labels)
 
     # Converte retorno para int
     le_transform = map(int, le.transform(le.classes_))
 
-    # Cria dicionario assciando os resultados do le com as classes
-    dict_classes = dict(zip(le.classes_, le_transform))
+    # Cria dicionario associando os resultados do le com as classes
+    dict_classes = dict(zip(le_transform, le.classes_))
 
-    return le.transform(y_labels), dict_classes
+    return le.transform(y_labels), dict_classes, le
 
 
 def pre_processa_entrada(df):
@@ -138,6 +135,7 @@ def pre_processa_entrada(df):
     """
     colunas = df.columns
     dict_classes = {}
+    le = None
 
     # Apaga as linhas que possuem valor nulo na última coluna
     df.dropna(subset=[colunas[-1]], inplace=True)
@@ -152,7 +150,7 @@ def pre_processa_entrada(df):
 
     # Categoriza y, caso seja tipo object
     if y.dtype == 'object':
-        y, dict_classes = categoriza_rotulos(y.values)
+        y, dict_classes, le = categoriza_rotulos(y.values)
 
     # Preenchendo valores nulos em X
     X.fillna(X.mean(), inplace=True)
@@ -160,7 +158,7 @@ def pre_processa_entrada(df):
     # Concatenando X e y
     X[colunas[-1]] = y
 
-    return X, dict_classes
+    return X, dict_classes, le, colunas[-1]
 
 
 def processa(filename):
@@ -180,8 +178,10 @@ def processa(filename):
         # Abre aquivo de entrada e o armazena no DataFrame
         df = pd.read_csv('{0}/{1}'.format(UPLOAD_FOLDER, filename), sep=',')
 
+        global le
+
         # Pré-processa arquivo de entrada
-        df, dict_classes = pre_processa_entrada(df)
+        df, dict_classes, le, y_label = pre_processa_entrada(df)
 
         # Persiste o DataFrame pré-processado
         df.to_csv('{0}/{1}'.format(UPLOAD_FOLDER, filename), index=False)
@@ -194,7 +194,7 @@ def processa(filename):
         fscore = modelo.booster().get_fscore()
 
         # Gráfico de importância dos parâmetros
-        plot_features_importance(modelo, GRAFICO_F_IMPORTANCE)
+        # plot_features_importance(modelo, GRAFICO_F_IMPORTANCE)
 
         # Salva a informação das colunas dos dados de entrada,
         # para serem usadas na simulação
@@ -210,7 +210,7 @@ def processa(filename):
         dict_info = {
             'filename': filename, 'modelo': 'model/0001.model',
             'pontuacao': pontuacao, 'features': features,
-            'dict_classes': dict_classes, 'fscore': fscore,
+            'dict_classes': dict_classes, 'fscore': fscore, 'y_label': y_label
         }
 
         table.update(dict_info) if len(table.all()) == 1 else table.insert(dict_info)
@@ -237,7 +237,7 @@ def simulacao():
     # features = obtem_informacao(INFO, 'features')
     info = table.all()
     if len(info) == 1:
-    	features = info[0]
+    	info = info[0]
     else:
     	return json.dumps({'erro': 'erro'})
 
@@ -248,18 +248,24 @@ def simulacao():
         form_data = request.form.to_dict()
 
         # Realiza a avaliação
-        nota = avalia_feature(
-            [f['nome'] for f in features['features']], **form_data
-        )
+        nota = float(avalia_feature(
+            [f['nome'] for f in info['features']], **form_data
+        ))
 
-        return json.dumps({'sucesso': True, 'nota': float(nota)})
+        # dict_classes = table.all()[0]['dict_classes']
+
+        dict_classes = info['dict_classes']
+        if dict_classes:
+            nota = dict_classes[str(int(nota))] 
+        
+        return json.dumps({'sucesso': True, 'nota': nota, 'y_label': info['y_label']})
 
     # Verifica falha na leitura das features
-    if features is None:
-        flash('Erro no arquivo!')
-        return redirect('/dados')
+    #if features is None:
+    #    flash('Erro no arquivo!')
+    #    return redirect('/dados')
 
-    features = features['features']
+    features = info['features']
 
     return json.dumps({'features': features})
 
