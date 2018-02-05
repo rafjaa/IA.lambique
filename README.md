@@ -5,7 +5,7 @@ ___Projeto de Extensão Edital 08/2017 - IF Sudeste MG, Campus Barbacena___
 __Orientador:__ <a href="http://lattes.cnpq.br/3995585094514614" target="_blank">Prof. Rafael José de Alencar Almeida</a><br />
 __Bolsistas:__
 - <a href="http://lattes.cnpq.br/4539575610533576" target="_blank">Luciano Carlos de Paiva</a>
-- <a href="http://lattes.cnpq.br/1080835313733221" target="_blank">Érika Cristina Santos de Assis</a> (voluntária)
+- <a href="http://lattes.cnpq.br/1080835313733221" target="_blank">Érika Cristina Santos de Assis</a>
 
 <img align="right" width="50%" src="http://aprendizadodemaquina.com.br/grafico_aguradente.png?v=3" alt="Gráfico aprendizado de máquina aplicado à produção de cachaça">
 
