@@ -61,7 +61,7 @@ $(document).ready(function(){
 						datasets: [{
 							label:"Pontuação",
 							data: data[1],
-							backgroundColor: 'rgba(255, 0, 0, 0.4)',//getRandomColorEachEmployee(data[0].length),
+							backgroundColor: 'rgba(100,149,237, 0.9)',//getRandomColorEachEmployee(data[0].length),
 							
 
 						}]

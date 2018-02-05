@@ -1,19 +1,14 @@
 import os
 
-from flask import Flask, request, flash, render_template
+from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib
-import xgboost as xgb
 import json
 from sklearn import preprocessing
 from tinydb import Query, TinyDB
 
 from classificador import cria_modelo, avalia_feature
 from settings import *
-
-matplotlib.style.use('ggplot')
 
 # Servidor HTTP
 app = Flask(__name__)
@@ -63,7 +58,7 @@ def info():
     try:
         return json.dumps(table.all()[0])
     except IndexError as e:
-    	return json.dumps({})
+        return json.dumps({})
 
 
 @app.route('/dados', methods=["POST"])
@@ -191,10 +186,7 @@ def processa(filename):
         if modelo is None:
             return 1, None, None
 
-        fscore = modelo.booster().get_fscore()
-
-        # Gráfico de importância dos parâmetros
-        # plot_features_importance(modelo, GRAFICO_F_IMPORTANCE)
+        fscore = modelo.get_booster().get_fscore()
 
         # Salva a informação das colunas dos dados de entrada,
         # para serem usadas na simulação
@@ -237,9 +229,9 @@ def simulacao():
     # features = obtem_informacao(INFO, 'features')
     info = table.all()
     if len(info) == 1:
-    	info = info[0]
+        info = info[0]
     else:
-    	return json.dumps({'erro': 'erro'})
+        return json.dumps({'erro': 'erro'})
 
     # Caso seja realizado uma requisição POST, realiza-se a avaliação
     if request.method == 'POST':
@@ -256,12 +248,12 @@ def simulacao():
 
         dict_classes = info['dict_classes']
         if dict_classes:
-            nota = dict_classes[str(int(nota))] 
-        
+            nota = dict_classes[str(int(nota))]
+
         return json.dumps({'sucesso': True, 'nota': nota, 'y_label': info['y_label']})
 
     # Verifica falha na leitura das features
-    #if features is None:
+    # if features is None:
     #    flash('Erro no arquivo!')
     #    return redirect('/dados')
 
